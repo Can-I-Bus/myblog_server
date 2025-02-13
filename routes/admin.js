@@ -2,14 +2,21 @@ const express = require('express');
 const { login, update } = require('../service/admin_service');
 const { formatRes } = require('../utils/res');
 const { validateToken } = require('../utils/validate_token');
+const { ValidationError } = require('../utils/errors');
 const router = express.Router();
 
 router.post('/login', async function (req, res, next) {
+    if (req.body.captcha.toLowerCase() !== req.session.captcha.toLowerCase()) {
+        throw new ValidationError('验证码错误');
+    }
     const result = await login(req.body);
+    console.log(result);
     if (result?.token) {
         res.setHeader('authorization', result.token);
+        res.send(formatRes(0, 'ok', result.data));
+    } else {
+        res.send(formatRes(1, '用户名或密码错误', null));
     }
-    res.send(formatRes(0, 'ok', result.data));
 });
 
 router.get('/validate_token', async function (req, res, next) {

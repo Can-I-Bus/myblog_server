@@ -1,10 +1,11 @@
 const createError = require('http-errors');
-const express = require('express');
 const path = require('path');
+const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const { expressjwt } = require('express-jwt');
 const md5 = require('md5');
+const session = require('express-session');
+const { expressjwt } = require('express-jwt');
 const { ForbiddenError, ServiceError, UnKnowError } = require('./utils/errors');
 
 //读取项目根目录下的env文件
@@ -14,9 +15,17 @@ require('express-async-errors');
 require('./dao/init');
 
 const admin_router = require('./routes/admin');
+const captcha_router = require('./routes/captcha');
 
 const app = express();
 
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: true, //表示是否每次都重新保存session，即使没有修改
+        saveUninitialized: true, //表示是否每次都初始化session，即使没有修改
+    })
+);
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -31,11 +40,15 @@ app.use(
         secret: jwtSecret,
         algorithms: ['HS256'],
     }).unless({
-        path: [{ url: '/api/admin/login', methods: ['POST'] }],
+        path: [
+            { url: '/api/admin/login', methods: ['POST'] },
+            { url: '/res/captcha', methods: ['GET'] },
+        ],
     })
 );
 
 app.use('/api/admin', admin_router);
+app.use('/res/captcha', captcha_router);
 
 app.use(function (req, res, next) {
     next(createError(404));
