@@ -30,7 +30,6 @@ exports.update = async ({ id = '', name = '', login_id = '', login_pwd = '', new
     login_pwd = md5(login_pwd);
     new_login_pwd = md5(new_login_pwd);
     const admin = await login({ login_id, login_pwd });
-    console.log(admin);
     if (!admin?.dataValues) {
         throw new ValidationError('用户不存在或密码错误');
     } else {

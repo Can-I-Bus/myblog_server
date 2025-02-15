@@ -4,7 +4,6 @@ const router = express.Router();
 
 router.get('/', async function (req, res, next) {
     const result = await getCaptcha();
-    console.log(result);
     req.session.captcha = result.text;
     res.setHeader('Content-Type', 'image/svg+xml');
     res.send(result.data);
