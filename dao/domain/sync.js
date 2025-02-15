@@ -1,6 +1,7 @@
 const admin = require('./admin');
 const banner = require('./banner');
 const sequelize = require('../db_connect');
+const blog_type = require('./blog_type');
 const md5 = require('md5');
 (async () => {
     await sequelize.sync({ alter: true });

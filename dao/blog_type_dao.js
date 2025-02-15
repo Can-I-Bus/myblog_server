@@ -1,0 +1,45 @@
+const blog_type = require('./domain/blog_type');
+
+//获取全部
+module.exports.get_all = async function get_all() {
+    return await blog_type.findAll();
+};
+
+//获取单个
+module.exports.get_by_id = async function get_by_id(id) {
+    return await blog_type.findByPk(id);
+};
+
+//更新
+module.exports.update = async function update({ id = '', name = '', article_count = 0, order = '' } = {}) {
+    return await blog_type.update(
+        {
+            name,
+            article_count,
+            order,
+        },
+        {
+            where: {
+                id,
+            },
+        }
+    );
+};
+
+//添加
+module.exports.add = async function add({ name = '', article_count = 0, order = '' } = {}) {
+    return await blog_type.create({
+        name,
+        article_count,
+        order,
+    });
+};
+
+//删除
+module.exports.delete_by_id = async function delete_by_id(id = '') {
+    return await blog_type.destroy({
+        where: {
+            id,
+        },
+    });
+};

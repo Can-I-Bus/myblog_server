@@ -18,6 +18,7 @@ const admin_router = require('./routes/admin');
 const captcha_router = require('./routes/captcha');
 const banner_router = require('./routes/banner');
 const upload_router = require('./routes/upload');
+const blog_type_router = require('./routes/blog_type');
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.use('/api/admin', admin_router);
 app.use('/res/captcha', captcha_router);
 app.use('/api/banner', banner_router);
 app.use('/api/upload', upload_router);
+app.use('/api/blog_type', blog_type_router);
 
 app.use(function (req, res, next) {
     next(createError(404));
