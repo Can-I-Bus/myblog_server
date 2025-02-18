@@ -2,8 +2,12 @@ const admin = require('./admin');
 const banner = require('./banner');
 const sequelize = require('../db_connect');
 const blog_type = require('./blog_type');
+const article = require('./article');
 const md5 = require('md5');
 (async () => {
+    blog_type.hasMany(article, { foreignKey: 'category_id', targetKey: 'id' });
+    article.belongsTo(blog_type, { foreignKey: 'category_id', targetKey: 'id', as: 'category' });
+
     await sequelize.sync({ alter: true });
     // 初始化管理员数据
     const admin_count = await admin.count();

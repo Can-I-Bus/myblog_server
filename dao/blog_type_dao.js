@@ -1,4 +1,5 @@
 const blog_type = require('./domain/blog_type');
+const article = require('./domain/article');
 
 //获取全部
 module.exports.get_all = async function get_all() {
@@ -37,9 +38,16 @@ module.exports.add = async function add({ name = '', article_count = 0, order = 
 
 //删除
 module.exports.delete_by_id = async function delete_by_id(id = '') {
-    return await blog_type.destroy({
+    const result = await blog_type.destroy({
         where: {
             id,
         },
     });
+    //同时删除该分类下的所有文章
+    await article.destroy({
+        where: {
+            category_id: id,
+        },
+    });
+    return result;
 };

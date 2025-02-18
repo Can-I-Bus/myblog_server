@@ -1,0 +1,59 @@
+const { get_article, update, add, delete_by_id } = require('../dao/article_dao');
+const { formatRes } = require('../utils/res');
+const { formatToc } = require('../utils/toc');
+const { NotFoundError } = require('../utils/errors');
+
+const is_article_exist = async (id) => {
+    const atcile = await get_by_id(id);
+    if (!atcile?.dataValues) {
+        throw new NotFoundError('文章不存在').toResJSON();
+    }
+    return true;
+};
+
+exports.get_records = async function get_records({ id = '', page = 1, limit = 50, category_id = '', token = '' } = {}) {
+    const blog_type_list = await get_article({ id, page, limit, category_id, token });
+    return formatRes(0, 'ok', blog_type_list);
+};
+
+exports.update_article = async function update_article(id, new_article_info) {
+    if (id === '' || !id) {
+        return formatRes(1, '请输入要更新的文章 id', null);
+    }
+    await is_article_exist(id);
+    const result = await update(id, new_article_info);
+    if (!result) {
+        return formatRes(1, '更新失败', null);
+    } else {
+        return formatRes(0, 'ok', null);
+    }
+};
+
+exports.add_article = async function add_article({
+    title = '',
+    description = 0,
+    toc = [],
+    html_content = '',
+    thumb = '',
+    scan_number = '',
+    comment_number = 0,
+    markedown_content = '',
+} = {}) {
+    toc = JSON.stringify(formatToc(markedown_content));
+    const result = await add({ title, description, toc, html_content, thumb, scan_number, comment_number });
+    if (!result?.dataValues) {
+        return formatRes(1, '添加失败', null);
+    } else {
+        return formatRes(0, 'ok', null);
+    }
+};
+
+exports.delete_article = async function delete_article(id) {
+    await is_article_exist(id);
+    const result = await delete_by_id(id);
+    if (!result) {
+        return formatRes(1, '删除失败', null);
+    } else {
+        return formatRes(0, 'ok', null);
+    }
+};

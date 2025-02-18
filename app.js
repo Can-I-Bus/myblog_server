@@ -19,6 +19,7 @@ const captcha_router = require('./routes/captcha');
 const banner_router = require('./routes/banner');
 const upload_router = require('./routes/upload');
 const blog_type_router = require('./routes/blog_type');
+const article_router = require('./routes/article');
 
 const app = express();
 
@@ -46,7 +47,16 @@ app.use(
         path: [
             { url: '/api/admin/login', methods: ['POST'] },
             { url: '/res/captcha', methods: ['GET'] },
+            { url: '/api/banner', methods: ['GET'] },
+            { url: '/api/article', methods: ['GET'] },
+            { url: '/api/blog_type', methods: ['GET'] },
         ],
+        custom: (req) => {
+            if (req.path.startsWith('/api/article') && req.method === 'GET' && req.query?.id && req.query.id.trim() !== '') {
+                return true;
+            }
+            return false;
+        },
     })
 );
 
@@ -55,6 +65,7 @@ app.use('/res/captcha', captcha_router);
 app.use('/api/banner', banner_router);
 app.use('/api/upload', upload_router);
 app.use('/api/blog_type', blog_type_router);
+app.use('/api/article', article_router);
 
 app.use(function (req, res, next) {
     next(createError(404));

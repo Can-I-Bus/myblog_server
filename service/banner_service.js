@@ -12,11 +12,7 @@ const is_banner_exist = async (id) => {
 
 exports.get_banner_list = async function get_banner_list() {
     const banner_list = await get_all();
-    if (!banner_list) {
-        return formatRes(1, '获取banner列表失败', null);
-    } else {
-        return formatRes(0, 'ok', banner_list);
-    }
+    return formatRes(0, 'ok', banner_list);
 };
 
 exports.update_banner = async function update_banner({ id = '', title = '', big_img = '', mid_img = '', description = '' } = {}) {

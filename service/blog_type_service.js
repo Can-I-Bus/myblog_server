@@ -12,11 +12,7 @@ const is_type_exist = async (id) => {
 
 exports.get_blog_type_list = async function get_blog_type_list() {
     const blog_type_list = await get_all();
-    if (!blog_type_list) {
-        return formatRes(1, '分类列表为空', null);
-    } else {
-        return formatRes(0, 'ok', blog_type_list);
-    }
+    return formatRes(0, 'ok', blog_type_list);
 };
 
 exports.update_blog_type = async function update_blog_type({ id = '', name = '', article_count = 0, order = '' } = {}) {
