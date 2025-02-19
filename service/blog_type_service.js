@@ -1,4 +1,5 @@
 const { get_all, get_by_id, update, add, delete_by_id } = require('../dao/blog_type_dao');
+const { delete_by_category_id: delete_article_by_category_id } = require('../dao/article_dao');
 const { formatRes } = require('../utils/res');
 const { NotFoundError } = require('../utils/errors');
 
@@ -40,7 +41,7 @@ exports.add_blog_type = async function add_blog_type({ name = '', article_count 
 exports.delete_blog_type = async function delete_blog_type(id) {
     await is_type_exist(id);
     const result = await delete_by_id(id);
-    console.log(result);
+    await delete_article_by_category_id(id);
     if (!result) {
         return formatRes(1, '删除失败', null);
     } else {

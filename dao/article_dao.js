@@ -1,5 +1,7 @@
 const article = require('./domain/article');
 const blog_type = require('./domain/blog_type');
+const comment = require('./domain/comment');
+const { Op } = require('sequelize');
 
 async function add_scan_number(id = '') {
     await article.increment('scan_number', {
@@ -86,6 +88,15 @@ module.exports.delete_by_id = async function delete_by_id(id = '') {
     return await article.destroy({
         where: {
             id,
+        },
+    });
+};
+
+//根据分类id来删除文章
+module.exports.delete_by_category_id = async function delete_by_category_id(category_id = '') {
+    return await article.destroy({
+        where: {
+            category_id,
         },
     });
 };

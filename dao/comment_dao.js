@@ -33,3 +33,12 @@ module.exports.delete_by_id = async function delete_by_id(id) {
         },
     });
 };
+
+//根据article_id删除
+module.exports.delete_by_article_id = async function delete_by_article_id(article_id) {
+    return await comment.destroy({
+        where: {
+            article_id,
+        },
+    });
+};

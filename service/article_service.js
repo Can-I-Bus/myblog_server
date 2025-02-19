@@ -1,4 +1,5 @@
 const { get_article, update, add, delete_by_id } = require('../dao/article_dao');
+const { delete_by_article_id: delete_comment_by_article_id } = require('../dao/comment_dao');
 const { formatRes } = require('../utils/res');
 const { formatToc } = require('../utils/toc');
 const { NotFoundError } = require('../utils/errors');
@@ -51,6 +52,7 @@ exports.add_article = async function add_article({
 exports.delete_article = async function delete_article(id) {
     await is_article_exist(id);
     const result = await delete_by_id(id);
+    await delete_comment_by_article_id(id);
     if (!result) {
         return formatRes(1, '删除失败', null);
     } else {
