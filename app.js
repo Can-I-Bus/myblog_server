@@ -21,6 +21,8 @@ const upload_router = require('./routes/upload');
 const blog_type_router = require('./routes/blog_type');
 const article_router = require('./routes/article');
 const demo_router = require('./routes/demo');
+const comment_router = require('./routes/comment');
+const message_router = require('./routes/message');
 
 const app = express();
 
@@ -68,6 +70,8 @@ app.use('/api/upload', upload_router);
 app.use('/api/blog_type', blog_type_router);
 app.use('/api/article', article_router);
 app.use('/api/project', demo_router);
+app.use('/api/comment', comment_router);
+app.use('/api/message', message_router);
 
 app.use(function (req, res, next) {
     next(createError(404));
