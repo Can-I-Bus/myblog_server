@@ -3,10 +3,16 @@ const banner = require('./banner');
 const sequelize = require('../db_connect');
 const blog_type = require('./blog_type');
 const article = require('./article');
+const comment = require('./comment');
+const message = require('./message');
+require('./demo');
 const md5 = require('md5');
 (async () => {
     blog_type.hasMany(article, { foreignKey: 'category_id', targetKey: 'id' });
     article.belongsTo(blog_type, { foreignKey: 'category_id', targetKey: 'id', as: 'category' });
+
+    article.hasMany(comment, { foreignKey: 'article_id', targetKey: 'id' });
+    comment.belongsTo(article, { foreignKey: 'article_id', targetKey: 'id', as: 'article' });
 
     await sequelize.sync({ alter: true });
     // 初始化管理员数据
