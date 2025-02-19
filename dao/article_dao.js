@@ -71,6 +71,7 @@ module.exports.add = async function add({
     thumb = '',
     scan_number = '',
     comment_number = 0,
+    category_id = '',
 } = {}) {
     return await article.create({
         title,
@@ -80,6 +81,7 @@ module.exports.add = async function add({
         thumb,
         scan_number,
         comment_number,
+        category_id,
     });
 };
 
@@ -98,5 +100,12 @@ module.exports.delete_by_category_id = async function delete_by_category_id(cate
         where: {
             category_id,
         },
+    });
+};
+
+//根据Id获取category_di
+module.exports.get_category_id_by_id = async function get_category_id_by_id(id = '') {
+    return await article.findByPk(id, {
+        attributes: ['category_id'],
     });
 };

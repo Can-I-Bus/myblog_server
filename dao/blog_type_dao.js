@@ -51,3 +51,19 @@ module.exports.delete_by_id = async function delete_by_id(id = '') {
     });
     return result;
 };
+
+//article_cunt ++
+module.exports.article_count_add = async function article_count_add(id = '') {
+    return await blog_type.increment('article_count', {
+        by: 1,
+        where: { id },
+    });
+};
+
+//article_cunt --
+module.exports.article_count_sub = async function article_count_sub(id = '') {
+    return await blog_type.decrement('article_count', {
+        by: 1,
+        where: { id },
+    });
+};
