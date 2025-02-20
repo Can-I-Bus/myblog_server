@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const md5 = require('md5');
 const session = require('express-session');
+const cors = require('cors');
 const { expressjwt } = require('express-jwt');
 const { ForbiddenError, ServiceError, UnKnowError } = require('./utils/errors');
 
@@ -25,6 +26,13 @@ const comment_router = require('./routes/comment');
 const message_router = require('./routes/message');
 
 const app = express();
+
+// 自定义 CORS 配置
+const corsOptions = {
+    origin: 'http://localhost:9090',
+};
+
+app.use(cors(corsOptions));
 
 app.use(
     session({
