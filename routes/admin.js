@@ -7,13 +7,12 @@ const router = express.Router();
 
 router.post('/login', async function (req, res, next) {
     if (req.body.captcha.toLowerCase() !== req.session.captcha.toLowerCase()) {
-        throw new ValidationError('验证码错误');
+        res.send(new ValidationError('验证码错误').toResJSON());
     }
     const result = await login(req.body);
     console.log(result);
-    if (result?.token) {
-        res.setHeader('authorization', result.token);
-        res.send(formatRes(0, 'ok', result.data));
+    if (result?.user) {
+        res.send(formatRes(0, 'ok', result));
     } else {
         res.send(formatRes(1, '用户名或密码错误', null));
     }

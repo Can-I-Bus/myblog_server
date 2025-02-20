@@ -30,6 +30,7 @@ const app = express();
 // 自定义 CORS 配置
 const corsOptions = {
     origin: 'http://localhost:9090',
+    credentials: true,
 };
 
 app.use(cors(corsOptions));
@@ -39,6 +40,9 @@ app.use(
         secret: process.env.SESSION_SECRET,
         resave: true, //表示是否每次都重新保存session，即使没有修改
         saveUninitialized: true, //表示是否每次都初始化session，即使没有修改
+        cookie: {
+            maxAge: 30000, //设置session的过期时间，单位是毫秒,3000表示
+        },
     })
 );
 app.use(logger('dev'));

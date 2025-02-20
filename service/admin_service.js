@@ -10,18 +10,14 @@ exports.login = async ({ login_id = '', login_pwd = '', rember = 1 } = {}, res) 
     const admin = await login({ login_id, login_pwd });
     let result = {};
     if (admin?.dataValues) {
-        result.data = {
-            id: admin.dataValues.id,
-            login_id: admin.dataValues.login_id,
-            name: admin.dataValues.name,
-        };
+        result.user = admin.dataValues;
         // 生成token
-        const token = jwt.sign(result.data, md5(process.env.JWT_SECRET), {
+        const token = jwt.sign(result.user, md5(process.env.JWT_SECRET), {
             expiresIn: 60 * 60 * 24 * rember,
         });
         result.token = token;
     } else {
-        result.data = null;
+        result.user = null;
     }
     return result;
 };
