@@ -11,7 +11,7 @@ router.post('/', async function (req, res, next) {
         if (err instanceof multer.MulterError) {
             next(new UploadError(err.message));
         } else {
-            res.send(formatRes(0, 'ok', '/static/uploads' + req.file.path));
+            res.send(formatRes(0, 'ok', `/static/uploads/` + req.file.filename));
         }
     });
 });
