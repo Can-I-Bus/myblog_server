@@ -6,8 +6,8 @@ const { formatToc } = require('../utils/toc');
 const { NotFoundError } = require('../utils/errors');
 
 const is_article_exist = async (id) => {
-    const atcile = await get_by_id(id);
-    if (!atcile?.dataValues) {
+    const atcile = await get_article(id);
+    if (!atcile) {
         throw new NotFoundError('文章不存在').toResJSON();
     }
     return true;
@@ -18,12 +18,13 @@ exports.get_records = async function get_records({ id = '', page = 1, limit = 50
     return formatRes(0, 'ok', blog_type_list);
 };
 
-exports.update_article = async function update_article(id, new_article_info) {
-    if (id === '' || !id) {
+exports.update_article = async function update_article(new_article_info) {
+    if (new_article_info?.id === '' || !new_article_info?.id) {
         return formatRes(1, '请输入要更新的文章 id', null);
     }
-    await is_article_exist(id);
-    const result = await update(id, new_article_info);
+    await is_article_exist(new_article_info.id);
+    new_article_info.toc = JSON.stringify(formatToc(new_article_info.markedown_content));
+    const result = await update(new_article_info.id, new_article_info);
     if (!result) {
         return formatRes(1, '更新失败', null);
     } else {
@@ -33,11 +34,11 @@ exports.update_article = async function update_article(id, new_article_info) {
 
 exports.add_article = async function add_article({
     title = '',
-    description = 0,
+    description = '',
     toc = [],
     html_content = '',
     thumb = '',
-    scan_number = '',
+    scan_number = 0,
     comment_number = 0,
     markedown_content = '',
     category_id = '',

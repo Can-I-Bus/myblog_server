@@ -1,7 +1,5 @@
 const article = require('./domain/article');
 const blog_type = require('./domain/blog_type');
-const comment = require('./domain/comment');
-const { Op } = require('sequelize');
 
 async function add_scan_number(id = '') {
     await article.increment('scan_number', {
@@ -15,7 +13,8 @@ module.exports.get_article = async function get_article({ id = '', page = 1, lim
     page = (page * 1 - 1) * limit;
     limit = limit * 1;
     if (id !== '' && id !== null && id !== undefined) {
-        const result = (await article.findByPk(id)?.dataValues) ?? null;
+        const result = await article.findByPk(id);
+        console.log(result, 'result>>>>>>');
         if (token === '') {
             await add_scan_number(id);
         }
