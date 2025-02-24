@@ -16,6 +16,16 @@ module.exports = sequelize.define(
             type: DataTypes.INTEGER,
             allowNull: false,
         },
+        parent_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: 'blog_type', // 关联到自己
+                key: 'id',
+            },
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+        },
     },
     {
         tableName: 'blog_type',

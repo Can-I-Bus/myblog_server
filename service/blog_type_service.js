@@ -11,12 +11,41 @@ const is_type_exist = async (id) => {
     return true;
 };
 
-exports.get_blog_type_list = async function get_blog_type_list() {
-    const blog_type_list = await get_all();
-    return formatRes(0, 'ok', blog_type_list);
+const get_tree_list = (list) => {
+    const map = new Map();
+    const result = [];
+
+    // 先将所有项存入 Map，方便快速查找
+    list.forEach((item) => map.set(item.id, { ...item, children: [] }));
+
+    // 遍历 list，将每个子项归入其父项的 `children`
+    list.forEach((item) => {
+        if (item.parent_id === null) {
+            // 根节点
+            result.push(map.get(item.id));
+        } else {
+            // 如果父级存在，则加入其 `children` 数组
+            const parent = map.get(item.parent_id);
+            if (parent) {
+                parent.children.push(map.get(item.id));
+            }
+        }
+    });
+
+    return result;
 };
 
-exports.update_blog_type = async function update_blog_type({ id = '', name = '', article_count = 0, order = '' } = {}) {
+exports.get_blog_type_list = async function get_blog_type_list() {
+    const blog_type_list = (await get_all()).map((i) => {
+        return i.dataValues;
+    });
+
+    const result = get_tree_list(blog_type_list);
+
+    return formatRes(0, 'ok', result);
+};
+
+exports.update_blog_type = async function update_blog_type({ id = '', name = '', article_count = 0, order = 1 } = {}) {
     if (id === '') {
         return formatRes(1, '请输入要更新的分类 id', null);
     }
@@ -29,8 +58,8 @@ exports.update_blog_type = async function update_blog_type({ id = '', name = '',
     }
 };
 
-exports.add_blog_type = async function add_blog_type({ name = '', article_count = 0, order = '' } = {}) {
-    const result = await add({ name, article_count, order });
+exports.add_blog_type = async function add_blog_type({ parent_id = null, name = '', article_count = 0, order = 1 } = {}) {
+    const result = await add({ name, article_count, order, parent_id });
     if (!result?.dataValues) {
         return formatRes(1, '添加失败', null);
     } else {

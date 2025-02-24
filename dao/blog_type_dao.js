@@ -28,8 +28,9 @@ module.exports.update = async function update({ id = '', name = '', article_coun
 };
 
 //添加
-module.exports.add = async function add({ name = '', article_count = 0, order = '' } = {}) {
+module.exports.add = async function add({ parent_id = null, name = '', article_count = 0, order = 1 } = {}) {
     return await blog_type.create({
+        parent_id,
         name,
         article_count,
         order,
