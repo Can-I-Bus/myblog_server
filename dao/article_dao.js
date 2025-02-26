@@ -1,7 +1,8 @@
 const article = require('./domain/article');
 const blog_type = require('./domain/blog_type');
+const comment = require('./domain/comment');
 
-async function add_scan_number(id = '') {
+async function add_scan_number(id) {
     await article.increment('scan_number', {
         by: 1,
         where: { id },
@@ -14,7 +15,6 @@ module.exports.get_article = async function get_article({ id = '', page = 1, lim
     limit = limit * 1;
     if (id !== '' && id !== null && id !== undefined) {
         const result = await article.findByPk(id);
-        console.log(result, 'result>>>>>>');
         if (token === '') {
             await add_scan_number(id);
         }
@@ -85,16 +85,40 @@ module.exports.add = async function add({
 };
 
 //删除
-module.exports.delete_by_id = async function delete_by_id(id = '') {
-    return await article.destroy({
-        where: {
-            id,
-        },
-    });
+module.exports.delete_by_id = async function delete_by_id(id) {
+    const t = await article.sequelize.transaction(); //开启事务
+    try {
+        //找到所有评论并删除
+        await comment.destroy({
+            where: { article_id: id },
+            transaction: t,
+        });
+        //删除文章
+        const result = await article.destroy({
+            where: { id },
+            transaction: t,
+        });
+        //找到对应的分类id
+        const category_id = await article.findByPk(id, {
+            attributes: ['category_id'],
+        });
+        //对应的分类文章数-1
+        await blog_type.decrement('article_count', {
+            by: 1,
+            where: { id: category_id.category_id },
+            transaction: t,
+        });
+        await t.commit(); //提交事务
+        return result;
+    } catch (error) {
+        await t.rollback();
+        console.error(error);
+        throw error;
+    }
 };
 
 //根据分类id来删除文章
-module.exports.delete_by_category_id = async function delete_by_category_id(category_id = '') {
+module.exports.delete_by_category_id = async function delete_by_category_id(category_id) {
     return await article.destroy({
         where: {
             category_id,
@@ -103,7 +127,7 @@ module.exports.delete_by_category_id = async function delete_by_category_id(cate
 };
 
 //根据Id获取category_di
-module.exports.get_category_id_by_id = async function get_category_id_by_id(id = '') {
+module.exports.get_category_id_by_id = async function get_category_id_by_id(id) {
     return await article.findByPk(id, {
         attributes: ['category_id'],
     });

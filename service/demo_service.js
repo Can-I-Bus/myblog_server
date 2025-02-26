@@ -10,8 +10,8 @@ const is_demo_exist = async (id) => {
     return true;
 };
 
-exports.get_demo_list = async function get_demo_list() {
-    const demo_list = await get_demo();
+exports.get_demo_list = async function get_demo_list({ id, page, limit }) {
+    const demo_list = await get_demo({ id, page, limit });
     return formatRes(0, 'ok', demo_list);
 };
 

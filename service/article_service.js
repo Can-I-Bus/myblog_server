@@ -1,5 +1,4 @@
 const { get_article, update, add, delete_by_id } = require('../dao/article_dao');
-const { delete_by_article_id: delete_comment_by_article_id } = require('../dao/comment_dao');
 const { article_count_add, article_count_sub } = require('../dao/blog_type_dao');
 const { formatRes } = require('../utils/res');
 const { formatToc } = require('../utils/toc');
@@ -56,7 +55,6 @@ exports.add_article = async function add_article({
 exports.delete_article = async function delete_article(id) {
     await is_article_exist(id);
     const result = await delete_by_id(id);
-    await delete_comment_by_article_id(id);
     //根据文章id获取category_id
     const article = await get_article(id);
     //文章分类下的总量--

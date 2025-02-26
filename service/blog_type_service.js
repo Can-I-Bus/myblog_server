@@ -70,7 +70,6 @@ exports.add_blog_type = async function add_blog_type({ parent_id = null, name = 
 exports.delete_blog_type = async function delete_blog_type(id) {
     await is_type_exist(id);
     const result = await delete_by_id(id);
-    await delete_article_by_category_id(id);
     if (!result) {
         return formatRes(1, '删除失败', null);
     } else {

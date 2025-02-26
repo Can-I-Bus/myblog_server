@@ -1,5 +1,5 @@
 const comment = require('./domain/comment');
-
+const article = require('./domain/article');
 async function get_by_id(id) {
     return await comment.findByPk(id);
 }
@@ -12,6 +12,7 @@ module.exports.get_comment = async function get_comment({ id = '', page = 1, lim
     page = (page * 1 - 1) * limit;
     limit = limit * 1;
     return await comment.findAndCountAll({
+        include: [{ model: article, as: 'article' }],
         offset: page,
         limit,
     });
