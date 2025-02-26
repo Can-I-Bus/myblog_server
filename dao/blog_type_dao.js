@@ -17,8 +17,8 @@ async function get_need_delete_id(id) {
         //如果有子分类，则递归获取所有子分类id
         for (let i = 0; i < sub_category_id_list.length; i++) {
             const sub_category_id = sub_category_id_list[i].id;
-            const sub_category_id_list = await get_need_delete_id(sub_category_id);
-            category_id_list.push(...sub_category_id_list);
+            const _sub_category_id_list = await get_need_delete_id(sub_category_id);
+            category_id_list.push(..._sub_category_id_list);
         }
     }
     return category_id_list;
@@ -54,17 +54,19 @@ async function delete_category_and_article_and_comment(id) {
                     },
                     transaction: t,
                 });
-                //删除所有分类
-                await blog_type.destroy({
-                    where: {
-                        id: { [Op.in]: category_id_list },
-                    },
-                    transaction: t,
-                });
-                //提交事务
-                await t.commit();
             }
+            //删除所有分类
+            const result = await blog_type.destroy({
+                where: {
+                    id: { [Op.in]: category_id_list },
+                },
+                transaction: t,
+            });
+            //提交事务
+            await t.commit();
+            return result;
         }
+        return null;
     } catch (error) {
         await t.rollback();
         console.error(error);
