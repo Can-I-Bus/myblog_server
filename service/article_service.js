@@ -22,7 +22,9 @@ exports.update_article = async function update_article(new_article_info) {
         return formatRes(1, '请输入要更新的文章 id', null);
     }
     await is_article_exist(new_article_info.id);
-    new_article_info.toc = JSON.stringify(formatToc(new_article_info.markedown_content));
+    const { tree, html } = formatToc(new_article_info.markedown_content);
+    new_article_info.toc = JSON.stringify(tree);
+    new_article_info.html_content = html;
     const result = await update(new_article_info.id, new_article_info);
     if (!result) {
         return formatRes(1, '更新失败', null);
@@ -42,7 +44,9 @@ exports.add_article = async function add_article({
     markedown_content = '',
     category_id = '',
 } = {}) {
-    toc = JSON.stringify(formatToc(markedown_content));
+    const { tree, html } = formatToc(markedown_content);
+    toc = JSON.stringify(tree);
+    html_content = html;
     const result = await add({ title, description, toc, html_content, thumb, scan_number, comment_number, category_id });
     await article_count_add(category_id);
     if (!result?.dataValues) {
