@@ -4,7 +4,7 @@ const { get_blog_type_list, update_blog_type, add_blog_type, delete_blog_type } 
 
 //获取分类
 router.get('/', async function (req, res, next) {
-    res.send(await get_blog_type_list());
+    res.send(await get_blog_type_list(req.query));
 });
 
 //添加分类

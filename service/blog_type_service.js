@@ -1,5 +1,5 @@
 const { get_all, get_by_id, update, add, delete_by_id } = require('../dao/blog_type_dao');
-const { delete_by_category_id: delete_article_by_category_id } = require('../dao/article_dao');
+const { get_article } = require('../dao/article_dao');
 const { formatRes } = require('../utils/res');
 const { NotFoundError } = require('../utils/errors');
 
@@ -35,12 +35,27 @@ const get_tree_list = (list) => {
     return result;
 };
 
-exports.get_blog_type_list = async function get_blog_type_list() {
+exports.get_blog_type_list = async function get_blog_type_list(query) {
+    const { need_article = false } = query;
+    let result;
     const blog_type_list = (await get_all()).map((i) => {
         return i.dataValues;
     });
+    if (!need_article) {
+        result = get_tree_list(blog_type_list);
+    } else {
+        let _result = [];
+        for (let i = 0; i < blog_type_list.length; i++) {
+            let item = blog_type_list[i];
+            const _article_list = await get_article({ category_id: item.id, limit: 10, page: 1 });
+            console.log(item.id, _article_list, 'article_list>>>>>>');
+            item = { ...item, article_list: _article_list.rows };
+            _result.push(item);
+        }
 
-    const result = get_tree_list(blog_type_list);
+        console.log(_result, '_result>>>>>>');
+        result = get_tree_list(_result);
+    }
 
     return formatRes(0, 'ok', result);
 };
