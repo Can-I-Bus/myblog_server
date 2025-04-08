@@ -81,7 +81,24 @@ module.exports.get_all = async function get_all() {
 
 //获取单个
 module.exports.get_by_id = async function get_by_id(id) {
-    return await blog_type.findByPk(id);
+    const result = [];
+    const parent = await blog_type.findByPk(id);
+    if (parent.dataValues) {
+        result.push(parent.dataValues);
+        const children = await blog_type.findAll({
+            where: {
+                parent_id: id,
+            },
+        });
+        if (children.length > 0) {
+            for (let i = 0; i < children.length; i++) {
+                const child = children[i].dataValues;
+                result.push(child);
+            }
+        }
+        result.push(...children);
+    }
+    return result;
 };
 
 //更新

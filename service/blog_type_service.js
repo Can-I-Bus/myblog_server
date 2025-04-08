@@ -36,11 +36,16 @@ const get_tree_list = (list) => {
 };
 
 exports.get_blog_type_list = async function get_blog_type_list(query) {
-    const { need_article = false } = query;
+    const { need_article = false, category_id = '' } = query;
     let result;
-    const blog_type_list = (await get_all()).map((i) => {
-        return i.dataValues;
-    });
+    let blog_type_list;
+    if (category_id === '') {
+        blog_type_list = (await get_all({ where: { id: category_id } })).map((i) => {
+            return i.dataValues;
+        });
+    } else {
+        blog_type_list = await get_by_id(category_id);
+    }
     if (!need_article) {
         result = get_tree_list(blog_type_list);
     } else {
@@ -48,12 +53,10 @@ exports.get_blog_type_list = async function get_blog_type_list(query) {
         for (let i = 0; i < blog_type_list.length; i++) {
             let item = blog_type_list[i];
             const _article_list = await get_article({ category_id: item.id, limit: 10, page: 1 });
-            console.log(item.id, _article_list, 'article_list>>>>>>');
             item = { ...item, article_list: _article_list.rows };
             _result.push(item);
         }
 
-        console.log(_result, '_result>>>>>>');
         result = get_tree_list(_result);
     }
 
