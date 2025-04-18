@@ -5,7 +5,7 @@ const { NotFoundError } = require('../utils/errors');
 
 const is_type_exist = async (id) => {
     const type = await get_by_id(id);
-    if (!type?.dataValues) {
+    if (type.length === 0) {
         throw new NotFoundError('分类不存在').toResJSON();
     }
     return true;
@@ -36,7 +36,10 @@ const get_tree_list = (list) => {
 };
 
 exports.get_blog_type_list = async function get_blog_type_list(query) {
-    const { need_article = false, category_id = '' } = query;
+    const { need_article = false, need_rec = false, category_id = '', limit = 20, page = 1 } = query;
+    if (!need_rec) {
+        return formatRes(0, 'ok', get_tree_list(await get_all({ where: { id: category_id } })));
+    }
     let result;
     let blog_type_list;
     if (category_id === '') {
@@ -52,10 +55,19 @@ exports.get_blog_type_list = async function get_blog_type_list(query) {
         let _result = [];
         for (let i = 0; i < blog_type_list.length; i++) {
             let item = blog_type_list[i];
-            const _article_list = await get_article({ category_id: item.id, limit: 10, page: 1 });
-            item = { ...item, article_list: _article_list.rows };
+            const _article_list = await get_article({ category_id: item.id, limit: limit + 1, page: page });
+            // 判断是否有更多文章
+            const article_has_more = _article_list.rows.length > limit;
+            // 如果有多查的数据，截取前 limit 条
+            const articles = article_has_more ? _article_list.rows.slice(0, limit) : _article_list.rows;
+            item = {
+                ...item,
+                article_list: articles,
+                article_has_more,
+            };
             _result.push(item);
         }
+        result = get_tree_list(_result);
 
         result = get_tree_list(_result);
     }
@@ -63,12 +75,13 @@ exports.get_blog_type_list = async function get_blog_type_list(query) {
     return formatRes(0, 'ok', result);
 };
 
-exports.update_blog_type = async function update_blog_type({ id = '', name = '', article_count = 0, order = 1 } = {}) {
+exports.update_blog_type = async function update_blog_type({ id = '', name = '', article_count = 0, icon = '', order = 1 } = {}) {
+    console.log(id, name, article_count, icon, order);
     if (id === '') {
         return formatRes(1, '请输入要更新的分类 id', null);
     }
     await is_type_exist(id);
-    const result = await update({ id, name, article_count, order });
+    const result = await update({ id, name, article_count, order, icon });
     if (!result) {
         return formatRes(1, '更新博客分类失败', null);
     } else {
@@ -76,8 +89,8 @@ exports.update_blog_type = async function update_blog_type({ id = '', name = '',
     }
 };
 
-exports.add_blog_type = async function add_blog_type({ parent_id = null, name = '', article_count = 0, order = 1 } = {}) {
-    const result = await add({ name, article_count, order, parent_id });
+exports.add_blog_type = async function add_blog_type({ parent_id = null, name = '', article_count = 0, order = 1, icon = '' } = {}) {
+    const result = await add({ name, article_count, order, parent_id, icon });
     if (!result?.dataValues) {
         return formatRes(1, '添加失败', null);
     } else {
