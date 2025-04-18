@@ -16,6 +16,10 @@ module.exports = sequelize.define(
             type: DataTypes.INTEGER,
             allowNull: false,
         },
+        icon: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
         parent_id: {
             type: DataTypes.INTEGER,
             allowNull: true,

@@ -101,13 +101,23 @@ module.exports.get_by_id = async function get_by_id(id) {
     return result;
 };
 
+//根据parent_id获取所有
+module.exports.get_by_parent_id = async function get_by_parent_id(parent_id) {
+    return await blog_type.findAll({
+        where: {
+            parent_id,
+        },
+    });
+};
+
 //更新
-module.exports.update = async function update({ id = '', name = '', article_count = 0, order = '' } = {}) {
+module.exports.update = async function update({ id = '', name = '', article_count = 0, order = '', icon = '' } = {}) {
     return await blog_type.update(
         {
             name,
             article_count,
             order,
+            icon,
         },
         {
             where: {
@@ -118,12 +128,13 @@ module.exports.update = async function update({ id = '', name = '', article_coun
 };
 
 //添加
-module.exports.add = async function add({ parent_id = null, name = '', article_count = 0, order = 1 } = {}) {
+module.exports.add = async function add({ parent_id = null, name = '', article_count = 0, order = 1, icon = '' } = {}) {
     return await blog_type.create({
         parent_id,
         name,
         article_count,
         order,
+        icon,
     });
 };
 
