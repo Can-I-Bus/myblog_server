@@ -4,15 +4,18 @@ const router = express.Router();
 const { upload } = require('../utils/upload');
 const { formatRes } = require('../utils/res');
 const { UploadError } = require('../utils/errors');
+const { config, client, singleFileUpload } = require('../utils/aliyun');
 
 //上传
 router.post('/', async function (req, res, next) {
-    upload.single('file')(req, res, function (err) {
-        if (err instanceof multer.MulterError) {
+    singleFileUpload(req, res, function (err) {
+        if (err) {
             next(new UploadError(err.message));
-        } else {
-            res.send(formatRes(0, 'ok', `/static/uploads/` + req.file.filename));
         }
+        if (!req.file) {
+            next(new UploadError('请上传文件'));
+        }
+        res.send(formatRes(0, 'ok', { file: req.file }));
     });
 });
 
