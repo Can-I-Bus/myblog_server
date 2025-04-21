@@ -2,12 +2,12 @@ const article = require('./domain/article');
 const blog_type = require('./domain/blog_type');
 const comment = require('./domain/comment');
 
-async function add_scan_number(id) {
-    await article.increment('scan_number', {
+module.exports.add_scan_number = async function add_scan_number(id) {
+    return await article.increment('scan_number', {
         by: 1,
         where: { id },
     });
-}
+};
 
 //获取文章
 module.exports.get_article = async function get_article({ id = '', page = 1, limit = 50, category_id = '', token = '' } = {}) {
@@ -16,7 +16,10 @@ module.exports.get_article = async function get_article({ id = '', page = 1, lim
     if (id !== '' && id !== null && id !== undefined) {
         const result = await article.findByPk(id);
         if (token === '') {
-            await add_scan_number(id);
+            await article.increment('scan_number', {
+                by: 1,
+                where: { id },
+            });
         }
         if (result) {
             result.toc = JSON.parse(result.toc);
@@ -62,16 +65,7 @@ module.exports.update = async function update(id, new_article_info) {
 };
 
 //添加
-module.exports.add = async function add({
-    title = '',
-    description = 0,
-    toc = '',
-    html_content = '',
-    thumb = '',
-    scan_number = '',
-    comment_number = 0,
-    category_id = '',
-} = {}) {
+module.exports.add = async function add({ title = '', description = 0, toc = '', html_content = '', thumb = '', scan_number = '', comment_number = 0, category_id = '' } = {}) {
     return await article.create({
         title,
         description,
