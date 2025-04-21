@@ -10,8 +10,8 @@ const is_comment_exist = async (id) => {
     return true;
 };
 
-exports.get_comment_list = async function get_comment_list() {
-    const comment_list = await get_comment();
+exports.get_comment_list = async function get_comment_list(comment_query_info) {
+    const comment_list = await get_comment(comment_query_info);
     return formatRes(0, 'ok', comment_list);
 };
 

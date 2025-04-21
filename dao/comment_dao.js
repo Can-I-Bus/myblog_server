@@ -5,16 +5,39 @@ async function get_by_id(id) {
 }
 
 //获取comment
-module.exports.get_comment = async function get_comment({ id = '', page = 1, limit = 50 } = {}) {
+module.exports.get_comment = async function get_comment({
+    id = '',
+    article_id = '', // 新增文章ID参数
+    page = 1,
+    limit = 50,
+} = {}) {
+    // 如果传入了单个评论ID
     if (id !== '') {
         return await get_by_id(id);
     }
-    page = (page * 1 - 1) * limit;
-    limit = limit * 1;
+
+    // 处理分页参数
+    const offset = (page * 1 - 1) * limit;
+    const finalLimit = limit * 1;
+
+    // 构建查询条件
+    const where = {};
+    if (article_id) {
+        where.article_id = article_id;
+    }
+
     return await comment.findAndCountAll({
-        include: [{ model: article, as: 'article' }],
-        offset: page,
-        limit,
+        include: [
+            {
+                model: article,
+                as: 'article',
+                attributes: ['id', 'title'], // 按需获取文章字段
+            },
+        ],
+        where, // 添加筛选条件
+        offset,
+        limit: finalLimit,
+        order: [['created_at', 'DESC']], // 按时间倒序
     });
 };
 
