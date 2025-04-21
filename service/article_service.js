@@ -1,4 +1,4 @@
-const { get_article, update, add, delete_by_id } = require('../dao/article_dao');
+const { get_article, update, add, delete_by_id, add_scan_number } = require('../dao/article_dao');
 const { article_count_add, article_count_sub } = require('../dao/blog_type_dao');
 const { formatRes } = require('../utils/res');
 const { formatToc } = require('../utils/toc');
@@ -67,5 +67,15 @@ exports.delete_article = async function delete_article(id) {
         return formatRes(1, '删除失败', null);
     } else {
         return formatRes(0, 'ok', null);
+    }
+};
+
+exports.add_article_scan_number = async function add_article_scan_number(id) {
+    await is_article_exist(id);
+    const result = await add_scan_number(id);
+    if (result?.[0]?.[1] > 0) {
+        return formatRes(0, 'ok', null);
+    } else {
+        return formatRes(1, '添加失败', null);
     }
 };
