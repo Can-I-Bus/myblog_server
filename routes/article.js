@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { get_records, update_article, add_article, delete_article } = require('../service/article_service');
+const { get_records, update_article, add_article, delete_article, add_article_scan_number } = require('../service/article_service');
 
 //获取文章列表
 router.get('/', async function (req, res, next) {
@@ -24,4 +24,10 @@ router.delete('/', async function (req, res, next) {
     res.send(await delete_article(req.query.id));
 });
 
+//增加文章浏览量
+router.post('/view', async function (req, res, next) {
+    res.send(await add_article_scan_number(req.body.id));
+});
+
 module.exports = router;
+473068;
