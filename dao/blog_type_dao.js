@@ -76,7 +76,12 @@ async function delete_category_and_article_and_comment(id) {
 
 //获取全部
 module.exports.get_all = async function get_all() {
-    return await blog_type.findAll();
+    const result = [];
+    const blog_types = await blog_type.findAll();
+    blog_types.forEach((item) => {
+        result.push(item.dataValues);
+    });
+    return result;
 };
 
 //获取单个
