@@ -1,6 +1,40 @@
 const article = require('./domain/article');
 const blog_type = require('./domain/blog_type');
 const comment = require('./domain/comment');
+const { client, config } = require('../utils/aliyun'); // 同时引入config
+
+// 提取文章内容中的OSS图片URL
+const extractOssImages = (content) => {
+    // 从内容中提取所有图片URL
+    const imgRegex = /<img[^>]+src="([^"]+)"[^>]*>/g;
+    const matches = [];
+    let match;
+
+    while ((match = imgRegex.exec(content))) {
+        if (match[1].includes('/uploads/')) {
+            // 只处理上传到OSS的图片
+            const path = match[1].split('/uploads/')[1];
+            if (path) {
+                matches.push('uploads/' + path);
+            }
+        }
+    }
+
+    return matches;
+};
+
+// 删除OSS中的图片
+const deleteOssImages = async (images) => {
+    if (!images || images.length === 0) return;
+
+    try {
+        // 批量删除图片
+        await client.deleteMulti(images);
+        console.log(`成功删除${images.length}张云端图片`);
+    } catch (error) {
+        console.error('删除云端图片失败:', error);
+    }
+};
 
 module.exports.add_scan_number = async function add_scan_number(id) {
     return await article.increment('scan_number', {
@@ -82,6 +116,15 @@ module.exports.add = async function add({ title = '', description = 0, toc = '',
 module.exports.delete_by_id = async function delete_by_id(id) {
     const t = await article.sequelize.transaction(); //开启事务
     try {
+        // 获取文章内容，用于提取图片
+        const articleData = await article.findByPk(id);
+        if (!articleData) {
+            throw new Error('文章不存在');
+        }
+
+        // 从HTML内容中提取OSS图片路径
+        const ossImages = extractOssImages(articleData.html_content);
+
         //找到所有评论并删除
         await comment.destroy({
             where: { article_id: id },
@@ -103,6 +146,10 @@ module.exports.delete_by_id = async function delete_by_id(id) {
             transaction: t,
         });
         await t.commit(); //提交事务
+
+        // 删除OSS中的图片（在事务外执行，因为即使删除图片失败也不应该影响文章删除）
+        await deleteOssImages(ossImages);
+
         return result;
     } catch (error) {
         await t.rollback();

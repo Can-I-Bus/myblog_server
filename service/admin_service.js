@@ -5,8 +5,7 @@ const { login, update } = require('../dao/admin_dao');
 const { ValidationError } = require('../utils/errors');
 
 exports.login = async ({ login_id = '', login_pwd = '', rember = 1 } = {}, res) => {
-    login_pwd = md5(login_pwd);
-    rember = parseInt(rember);
+    rember = parseInt(rember) || 7;
     const admin = await login({ login_id, login_pwd });
     let result = {};
     if (admin?.dataValues) {
@@ -23,8 +22,6 @@ exports.login = async ({ login_id = '', login_pwd = '', rember = 1 } = {}, res) 
 };
 
 exports.update = async ({ id = '', name = '', login_id = '', login_pwd = '', new_login_pwd = '' } = {}, res) => {
-    login_pwd = md5(login_pwd);
-    new_login_pwd = md5(new_login_pwd);
     const admin = await login({ login_id, login_pwd });
     if (!admin?.dataValues) {
         throw new ValidationError('用户不存在或密码错误');

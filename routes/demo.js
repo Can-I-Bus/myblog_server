@@ -15,7 +15,8 @@ router.post('/', async function (req, res, next) {
 
 //修改demo
 router.put('/', async function (req, res, next) {
-    res.send(await update_demo(req.body));
+    const { id } = req.body;
+    res.send(await update_demo(id, req.body));
 });
 
 //删除demo

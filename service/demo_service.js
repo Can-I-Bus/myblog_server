@@ -16,11 +16,11 @@ exports.get_demo_list = async function get_demo_list({ id, page, limit }) {
 };
 
 exports.update_demo = async function update_demo(id, new_demo_info) {
-    if (id === '') {
+    if (!id) {
         return formatRes(1, '请输入要更新的demo id', null);
     }
     await is_demo_exist(id);
-    const result = await update(new_demo_info);
+    const result = await update(id, new_demo_info);
     if (!result) {
         return formatRes(1, '更新demo失败', null);
     } else {
